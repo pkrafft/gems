@@ -51,9 +51,9 @@ $(document).ready(function() {
     $("#submit-response").addClass('disabled');
     $("#submit-response").html('Sending...');
 
-    var response = $("#reproduction").val();
+    var response = $("#classification").val();
 
-    $("#reproduction").val("");
+    $("#classification").disabled = true;
 
     dallinger.createInfo(my_node_id, {
       contents: response,

@@ -4,9 +4,9 @@ var get_info = function() {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
     .done(function (resp) {
-      var story = resp.infos[0].contents;
-      var storyHTML = markdown.toHTML(story);
-      $("#story").html(storyHTML);
+      var choice = resp.infos[0].contents;
+      $('#loading').html('');
+      $("#graphic").attr('src', '/static/images/berry-1.png');
       $("#stimulus").show();
       $("#response-form").hide();
       $("#finish-reading").show();
@@ -43,6 +43,10 @@ $(document).ready(function() {
   $("#finish-reading").click(function() {
     $("#stimulus").hide();
     $("#response-form").show();
+    prior = '<select><option selected="selected" disabled>3</option></select>';
+    $("#previous").html('<p>You are a technician in the 5th shift.</p><p><b>A technician from the 4th shift, building on the work of the previous shifts, thought the classification is</b> ' + prior + '.</p>');
+    $("#evidence").html('<b>Your own first lab test shows that the classification is likely A, B, or C.</b>');
+    $("#more").html('<p><b>To see the opinion of another technician from the 4th shift click: </b><button id="resample" type="button" class="btn btn-info">Here</button></p>')
     $("#submit-response").removeClass('disabled');
     $("#submit-response").html('Submit');
   });

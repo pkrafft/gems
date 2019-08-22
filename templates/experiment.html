@@ -4,22 +4,34 @@
     <div class="main_div">
         <div id="stimulus">
             <h1>Read the following text:</h1>
-            <div><blockquote id="story"><p>&lt;&lt; loading &gt;&gt;</p></blockquote></div>
             <button id="finish-reading" type="button" class="btn btn-primary">I'm done reading.</button>
         </div>
 
         <div id="response-form" style="display:none;">
-            <h1>Now reproduce the passage, verbatim:</h1>
-            <p><b>Note:</b> Your task is to recreate the text, word for word, to the best of your ability.<p>
+            <h3>Gem Classification</h3>
+            <div id="loading"><p>&lt;&lt; loading &gt;&gt;</p></div>
+            <img id="graphic" src='' style='width:75px;height:75x;'>
+            <div id="previous"><p>&lt;&lt; loading &gt;&gt;</p></div>
+          </br>
+            <h4>Back in the Lab</h4>
+            <div id="evidence"><p>&lt;&lt; loading &gt;&gt;</p></div>
+          </br>
+            <h4>Classification</h4>
+            <div id="more"><p>&lt;&lt; loading &gt;&gt;</p></div>
+            <p>What classification do you think this gem is?<p>
               <select name="classification" id="classification">
+                <option selected="selected"></option>
                 <option>1</option>
                 <option>2</option>
-                <option selected="selected">3</option>
+                <option>3</option>
                 <option>4</option>
                 <option>5</option>
               </select>
-            <p></p>
-            <button id="submit-response" type="button" class="btn btn-primary">Submit response.</button>
+            </br>
+              <p>
+                <button id="continue" type="button" class="btn btn-secondary">Continue</button>
+                <button id="submit-response" type="button" class="btn btn-primary">Submit</button>
+              </p>
         </div>
     </div>
 {% endblock %}

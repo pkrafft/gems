@@ -1,6 +1,8 @@
 var my_node_id;
 var round = 1;
-var index = 2;
+var index = 0;
+var count = 0;
+var folds = ['previous', 'your-lab', 'your-choice', 'END'];
 
 var get_info = function() {
   // Get info for node
@@ -48,6 +50,8 @@ $(document).ready(function() {
     $("#stimulus").hide();
     $("#response-form").show();
 
+    $("#continue").prop('disabled', false);
+
     prior = '<select><option selected="selected" disabled>3</option></select>';
 
     $("#context").html('<p>You are a technician in the 5th shift.</p>');
@@ -56,32 +60,28 @@ $(document).ready(function() {
 
     $("#evidence-1").html('<b>Your own first lab test shows that the classification is likely A, B, or C.</b>');
 
-    $("#more").html('<p><b>To see the opinion of another technician from the 4th shift click: </b><button id="resample" type="button" class="btn btn-info">Here</button></p>')
-
-
-    $("#resample").click(function() {
-      $("#previous").hide();
-
-      index += 1
-      prior = '<select><option selected="selected" disabled>' + index + '</option></select>';
-
-      $("#nextsample").html('<p><b>A technician you ask from the 4th shift, building on the work of the previous shifts, thinks the classification is</b> ' + prior + '.</p>');
-    });
-
-
   });
 
   $("#continue").click(function() {
 
-    round += 1;
+    if (folds[index] == 'END') {
 
-    if(round <= 4) {
-      $("#evidence-" + round + "").html('<b>Your own test ' + round + ' shows that the classification is likely A, B, or C.</b>');
+      round += 1;
+
+      if(round <= 4) {
+        $("#evidence-" + round + "").html('<b>Your own test ' + round + ' shows that the classification is likely A, B, or C.</b>');
+      } else {
+        $("#continue").addClass('disabled');
+        //$("#submit-response").show();
+        $("#submit-response").prop('disabled', false);
+        //$("#submit-response").html('Submit');
+      }
     } else {
-      $("#continue").addClass('disabled');
-      //$("#submit-response").show();
-      $("#submit-response").prop('disabled', false);
-      //$("#submit-response").html('Submit');
+
+      var tab = '#' + folds[index];
+      $(tab).show();
+
+      index += 1
     }
 
   });
@@ -104,3 +104,34 @@ $(document).ready(function() {
   });
 
 });
+
+var resample = function() {
+
+      $("#previous").hide();
+
+      $("#choice-text").hide()
+      $("#alt-choice-text").show();
+      $("#resample-text").hide()
+
+      prior = '<select><option selected="selected" disabled>' + 0 + '</option></select>';
+
+      var text = '<p><div class="update" style="display: inline"><b><font color="red">Update!</font></b></div> ';
+      text += 'A technician you ask from the 4th shift, building on the work of the previous shifts, thinks the classification is ' + prior + '. ';
+      text += '<button id="hide-sample" type="button" class="btn btn-info btn-sm">HIDE</button></p>';
+
+      $('#nextsample').show();
+      $("#nextsample").html(text);
+
+      $("#hide-sample").click(function() {
+        $('#nextsample').hide();
+        $("#resample-text").show();
+      });
+
+      window.on("click", removeUpdates());
+    }
+
+var removeUpdates = function() {
+  count += 1
+  console.log('run ' + count);
+  $('.update').hide()
+}

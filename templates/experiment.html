@@ -12,19 +12,24 @@
             <div id="loading"><p>&lt;&lt; loading &gt;&gt;</p></div>
             <img id="graphic" src='' style='width:75px;height:75x;'>
             <div id="context"><p>&lt;&lt; loading &gt;&gt;</p></div>
-            <div id="previous"><p>&lt;&lt; loading &gt;&gt;</p></div>
+            <div id="previous" style="display:none;"><p>&lt;&lt; loading &gt;&gt;</p></div>
           </br>
+          <div id="your-lab" style="display:none;">
             <h4>Back in the Lab</h4>
             <div id="evidence-1"><p>&lt;&lt; loading &gt;&gt;</p></div>
             <div id="evidence-2"></div>
             <div id="evidence-3"></div>
             <div id="evidence-4"></div>
           </br>
+        </div>
+          <div id="your-choice" style="display:none;">
             <h4>Classification</h4>
-            <div id="nextsample"></div>
-            <div id="more"><p>&lt;&lt; loading &gt;&gt;</p></div>
-          </br>
-            <p>What do you think the classification of this gem is?<p>
+            <div id="choice-text">
+              <p><b>What do you think the classification of this gem is?</b></br><i>[To see the opinion of another technician from the previous shift click <a onclick="resample();">here</a>.</i>]</p>
+            </div>
+            <div id="alt-choice-text" style="display:none;"><p><b>What do you think the classification of this gem is?</b></p></div>
+            <div>
+              <p>
               <select name="classification" id="classification">
                 <option selected="selected"></option>
                 <option>1</option>
@@ -33,11 +38,19 @@
                 <option>4</option>
                 <option>5</option>
               </select>
-            </br></br>
+              <button id="submit-response" type="button" class="btn btn-primary" disabled="disabled">Submit</button>
+            </p>
+            </div>
+            <div id="nextsample"></div>
+            <div id="resample-text"  style="display:none;">
+              To see the opinion of another technician from the previous shift click <a onclick="resample();">here</a>.
+            </div>
+          </br></br>
+            </div>
               <p>
-                <button id="continue" type="button" class="btn btn-secondary">Continue</button>
-                <button id="submit-response" type="button" class="btn btn-primary" disabled="disabled">Submit</button>
+                <button id="continue" type="button" class="btn btn-secondary"  disabled="disabled">Continue</button>
               </p>
+
         </div>
     </div>
 {% endblock %}

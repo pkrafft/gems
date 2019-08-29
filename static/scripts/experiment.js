@@ -115,8 +115,7 @@ var resample = function() {
 
       prior = '<select><option selected="selected" disabled>' + 0 + '</option></select>';
 
-      var text = '<p><div class="update" style="display: inline"><b><font color="red">Update!</font></b></div> ';
-      text += 'A technician you ask from the 4th shift, building on the work of the previous shifts, thinks the classification is ' + prior + '. ';
+      var text = 'A technician you ask from the 4th shift, building on the work of the previous shifts, thinks the classification is ' + prior + '. ';
       text += '<button id="hide-sample" type="button" class="btn btn-info btn-sm">HIDE</button></p>';
 
       $('#nextsample').show();
@@ -127,11 +126,4 @@ var resample = function() {
         $("#resample-text").show();
       });
 
-      window.on("click", removeUpdates());
     }
-
-var removeUpdates = function() {
-  count += 1
-  console.log('run ' + count);
-  $('.update').hide()
-}

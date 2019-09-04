@@ -92,13 +92,12 @@ $(document).ready(function() {
 var next = function() {
 
   clearUpdates();
-  hideSample();
 
     prior = '<select><option selected="selected" disabled>3</option></select>';
 
     $("#context").html('<p>You are a technician in the 5th shift.</p>');
 
-    $("#previous").html('<p><b>A technician from the 4th shift, building on the work of the previous shifts, thought the classification is</b> ' + prior + '.</p>');
+    $("#previous").html('<p><b>Notes from the 4th shift indicate that another technician, building on previous shifts and using their own tests, thought the classification was</b> ' + prior + '.</p>');
 
     $("#evidence-1").html('<b>Your own first lab test shows that the classification is likely A, B, or C.</b>');
 
@@ -126,7 +125,7 @@ var resample = function() {
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
-      text += 'A technician you ask from the 4th shift, building on the work of the previous shifts, thinks the classification is ' + prior + '. ';
+      text += 'Further notes from the 4th shift indicate that a technician, building on previous shifts and using their own tests, thought the classification was ' + prior + '. ';
       text += '<button id="hide-sample" type="button" class="btn btn-info btn-sm">HIDE</button></p>';
 
       $('#nextsample').show();

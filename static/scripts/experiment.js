@@ -4,6 +4,8 @@ var index = 0;
 var folds;
 
 var shift;
+var classes;
+var tests;
 var last_generation = [];
 var samples_seen = [];
 var decisions = [];
@@ -26,6 +28,18 @@ var get_info = function() {
       } else {
         folds = ['#context', '#previous', '#your-lab', '#your-choice', 'END'];
       }
+
+      classes = last_info.classes
+
+      select = document.getElementById('classification');
+      for (var i = 0; i <= classes.length; i++){ //TODO: randomize order
+        var opt = document.createElement('option');
+        opt.value = classes[i];
+        opt.innerHTML = classes[i];
+        select.appendChild(opt);
+      }
+
+      tests = last_info.tests
 
       $('#loading').html('');
       $("#graphic").attr('src', '/static/images/berry-1.png'); // TODO: have 8 stimuli: vary image for each 1-8
@@ -59,7 +73,6 @@ var create_agent = function() {
 // Consent to the experiment.
 $(document).ready(function() {
 
-
   $("#continue").click(function() {
     next();
   });
@@ -69,6 +82,13 @@ $(document).ready(function() {
 
     var box = document.getElementById("classification");
     var choice = box.options[box.selectedIndex].text;
+
+
+    if(choice == '') {
+      window.alert('Please select a value.');
+      return
+    }
+
     decisions.push([round, choice]);
     console.log(decisions);
 
@@ -76,7 +96,7 @@ $(document).ready(function() {
       $("#submit-response").addClass('disabled');
       $("#submit-response").html('Sending...');
 
-      var response = JSON.stringify({'shift':shift,'choice':choice, 'decisions':decisions, 'seen':samples_seen});
+      var response = JSON.stringify({'shift':shift, 'classes':classes, 'tests':tests, 'choice':choice, 'decisions':decisions, 'seen':samples_seen});
 
       $("#classification").disabled = true;
 
@@ -101,7 +121,7 @@ $(document).ready(function() {
         if(shift > 1) {
           text += 'own '
         }
-        text += 'test ' + round + ' shows that the classification is likely A, B, or C.</b>';
+        text += 'test ' + round + ' shows that the classification is likely one of ' + tests[shift-1][round-1] + '.</b>';
 
         $("#evidence-" + round + "").html(text);
 
@@ -141,7 +161,7 @@ var next = function() {
     if(shift > 1) {
       text +=  'own ';
     }
-    text += 'first lab test shows that the classification is likely A, B, or C.</b>';
+    text += 'lab test 1 shows that the classification is likely one of ' + tests[shift-1][0] + '.</b>';
     $("#evidence-1").html(text);
 
     if(folds[index] != 'END') {

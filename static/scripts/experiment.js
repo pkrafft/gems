@@ -1,8 +1,10 @@
 var my_node_id;
 var round = 1;
 var index = 0;
-var folds = ['#context', '#previous', '#your-lab', '#your-choice', 'END'];
+var folds;
 
+var shift;
+var last_generation = [];
 var samples_seen = [];
 var decisions = [];
 
@@ -10,9 +12,21 @@ var get_info = function() {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
     .done(function (resp) {
-      var choice = resp.infos[0].contents;
+
+      // TODO: loop over all participants from last generation and get an array of decisions
+      var last_info = resp.infos[0].contents;
+      shift = last_info.shift + 1;
+      last_generation.push(last_info.choice);
+
+
+      if(shift == 1) {
+        folds = ['#context', '#your-lab', '#your-choice', 'END'];
+      } else {
+        folds = ['#context', '#previous', '#your-lab', '#your-choice', 'END'];
+      }
+
       $('#loading').html('');
-      $("#graphic").attr('src', '/static/images/berry-1.png');
+      $("#graphic").attr('src', '/static/images/berry-1.png'); // TODO: have 8 stimuli: vary image for each 1-8
     })
     .fail(function (rejection) {
       console.log(rejection);
@@ -60,7 +74,7 @@ $(document).ready(function() {
       $("#submit-response").addClass('disabled');
       $("#submit-response").html('Sending...');
 
-      var response = $("#classification").val();
+      var response = {'shift':shift,'choice':choice, 'decisions':decisions, 'seen':samples_seen};
 
       $("#classification").disabled = true;
 
@@ -81,7 +95,11 @@ $(document).ready(function() {
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
-        text += '<b>Your own test ' + round + ' shows that the classification is likely A, B, or C.</b>';
+        text += '<b>Your '
+        if(shift > 1) {
+          text += 'own '
+        }
+        text += 'test ' + round + ' shows that the classification is likely A, B, or C.</b>';
 
         $("#evidence-" + round + "").html(text);
 
@@ -101,18 +119,28 @@ var next = function() {
 
   clearUpdates();
 
-  var prior_sample = 3;
-    var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
+    $("#context").html('<p>You are a technician in shift ' + shift + '.</p>');
 
-    $("#context").html('<p>You are a technician in the 5th shift.</p>');
+    if((samples_seen.length == 0) && (shift > 1)) {
 
-    $("#previous").html('<p><b>Notes from the 4th shift indicate that another technician, building on previous shifts and using their own tests, thought the classification was</b> ' + prior + '.</p>');
-    if(samples_seen.length == 0) {
+      var prior_sample = last_generation[Math.floor(Math.random()*last_generation.length)];
+      var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
+
+      $("#previous").html('<p><b>Notes from shift ' + (shift - 1) + ' indicate that another technician, building on previous shifts and using their own tests, thought the classification was</b> ' + prior + '.</p>');
+
       samples_seen.push([round,prior_sample]);
       console.log(samples_seen);
+
+      $("#choice-text").show()
+      $("#alt-choice-text").hide();
     }
 
-    $("#evidence-1").html('<b>Your own first lab test shows that the classification is likely A, B, or C.</b>');
+    var text = '<b>Your ';
+    if(shift > 1) {
+      text +=  'own ';
+    }
+    text += 'first lab test shows that the classification is likely A, B, or C.</b>';
+    $("#evidence-1").html(text);
 
     if(folds[index] != 'END') {
       $(folds[index]).show();
@@ -134,12 +162,12 @@ var resample = function() {
       $("#alt-choice-text").show();
       $("#resample-text").hide()
 
-      var prior_sample = 0;
+      var prior_sample = last_generation[Math.floor(Math.random()*last_generation.length)];
       var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
-      text += 'Further notes from the 4th shift indicate that a technician, building on previous shifts and using their own tests, thought the classification was ' + prior + '. ';
+      text += 'Further notes from shift ' + (shift - 1) +  ' indicate that a technician, building on previous shifts and using their own tests, thought the classification was ' + prior + '. ';
       text += '<button id="hide-sample" type="button" class="btn btn-info btn-sm">HIDE</button></p>';
 
       $('#nextsample').show();

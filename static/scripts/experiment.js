@@ -14,10 +14,12 @@ var get_info = function() {
     .done(function (resp) {
 
       // TODO: loop over all participants from last generation and get an array of decisions
-      var last_info = resp.infos[0].contents;
+      var last_info = JSON.parse(resp.infos[0].contents);
+
+      console.log(last_info);
+
       shift = last_info.shift + 1;
       last_generation.push(last_info.choice);
-
 
       if(shift == 1) {
         folds = ['#context', '#your-lab', '#your-choice', 'END'];
@@ -74,7 +76,7 @@ $(document).ready(function() {
       $("#submit-response").addClass('disabled');
       $("#submit-response").html('Sending...');
 
-      var response = {'shift':shift,'choice':choice, 'decisions':decisions, 'seen':samples_seen};
+      var response = JSON.stringify({'shift':shift,'choice':choice, 'decisions':decisions, 'seen':samples_seen});
 
       $("#classification").disabled = true;
 

@@ -15,7 +15,7 @@ var get_info = function() {
   dallinger.getReceivedInfos(my_node_id)
     .done(function (resp) {
 
-      // TODO: loop over all participants from last generation and get an array of decisions
+      // TODO: (Bill) loop over all participants from last generation and get an array of decisions
       var last_info = JSON.parse(resp.infos[0].contents);
 
       console.log(last_info);
@@ -32,7 +32,7 @@ var get_info = function() {
       classes = last_info.classes
 
       select = document.getElementById('classification');
-      for (var i = 0; i <= classes.length; i++){ //TODO: randomize order
+      for (var i = 0; i <= classes.length; i++){ //TODO: (PK) randomize order
         var opt = document.createElement('option');
         opt.value = classes[i];
         opt.innerHTML = classes[i];
@@ -42,7 +42,7 @@ var get_info = function() {
       tests = last_info.tests
 
       $('#loading').html('');
-      $("#graphic").attr('src', '/static/images/berry-1.png'); // TODO: have 8 stimuli: vary image for each 1-8
+      $("#graphic").attr('src', '/static/images/berry-1.png'); // TODO: (Bill) have 8 stimuli: vary image for each 1-8
     })
     .fail(function (rejection) {
       console.log(rejection);
@@ -122,6 +122,7 @@ $(document).ready(function() {
           text += 'own '
         }
         text += 'test ' + round + ' shows that the classification is likely one of ' + tests[shift-1][round-1] + '.</b>';
+        // TODO: (PK) what to say when 0 or 1 tests come up positive?
 
         $("#evidence-" + round + "").html(text);
 

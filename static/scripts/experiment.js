@@ -1,8 +1,10 @@
 var my_node_id;
 var round = 1;
 var index = 0;
-var count = 0;
 var folds = ['#context', '#previous', '#your-lab', '#your-choice', 'END'];
+
+var samples_seen = [];
+var decisions = [];
 
 var get_info = function() {
   // Get info for node
@@ -48,6 +50,12 @@ $(document).ready(function() {
 
 
   $("#submit-response").click(function() {
+
+    var box = document.getElementById("classification");
+    var choice = box.options[box.selectedIndex].text;
+    decisions.push([round, choice]);
+    console.log(decisions);
+
     if(round == 4) {
       $("#submit-response").addClass('disabled');
       $("#submit-response").html('Sending...');
@@ -93,11 +101,16 @@ var next = function() {
 
   clearUpdates();
 
-    prior = '<select><option selected="selected" disabled>3</option></select>';
+  var prior_sample = 3;
+    var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
 
     $("#context").html('<p>You are a technician in the 5th shift.</p>');
 
     $("#previous").html('<p><b>Notes from the 4th shift indicate that another technician, building on previous shifts and using their own tests, thought the classification was</b> ' + prior + '.</p>');
+    if(samples_seen.length == 0) {
+      samples_seen.push([round,prior_sample]);
+      console.log(samples_seen);
+    }
 
     $("#evidence-1").html('<b>Your own first lab test shows that the classification is likely A, B, or C.</b>');
 
@@ -121,7 +134,8 @@ var resample = function() {
       $("#alt-choice-text").show();
       $("#resample-text").hide()
 
-      prior = '<select><option selected="selected" disabled>' + 0 + '</option></select>';
+      var prior_sample = 0;
+      var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
@@ -130,6 +144,9 @@ var resample = function() {
 
       $('#nextsample').show();
       $("#nextsample").html(text);
+
+      samples_seen.push([round,prior_sample]);
+      console.log(samples_seen);
 
       $("#hide-sample").click(function() {
         hideSample();

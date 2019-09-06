@@ -16,8 +16,15 @@ var get_info = function() {
     .done(function (resp) {
 
       // TODO: (Bill) loop over all participants from last generation and get an array of decisions
-      var last_info = JSON.parse(resp.infos[0].contents);
+      // DONE
+      var last_infos = []
+      for (var i = 0; i < resp.infos.length; i++) {
+        last_infos.push(JSON.parse(resp.infos[i].contents))
+      }
+      
+      var last_info = last_infos[0];
 
+      console.log(last_infos);
       console.log(last_info);
 
       shift = last_info.shift + 1;

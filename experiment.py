@@ -1,6 +1,7 @@
 """Bartlett's transmission chain experiment from Remembering (1932)."""
 
 import logging
+# import pysnooper
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
@@ -36,7 +37,8 @@ class Bartlett1932(Experiment):
 
         self.models = models
         self.experiment_repeats = 1
-        self.initial_recruitment_size = 1
+        self.initial_recruitment_size = self.generation_size = 2
+        self.generations = 2
         if session:
             self.setup()
 
@@ -57,9 +59,13 @@ class Bartlett1932(Experiment):
             for net in self.networks():
                 self.models.WarOfTheGhostsSource(network=net)
 
+    def create_node(self, network, participant):
+        return self.models.Particle(network=network,participant=participant)
+
     def create_network(self):
         """Return a new network."""
-        return Chain(max_size=self.num_participants)
+        # return Chain(max_size=self.num_participants)
+        return self.models.ParticleFilter(generations = self.generations, generation_size = self.generation_size)
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
@@ -70,9 +76,23 @@ class Bartlett1932(Experiment):
             parent.transmit()
         node.receive()
 
+    # @pysnooper.snoop()
     def recruit(self):
         """Recruit one participant at a time until all networks are full."""
         if self.networks(full=False):
-            self.recruiter.recruit(n=1)
+            network = self.models.ParticleFilter.query.one()
+
+            completed_participant_ids = [p.id for p in self.models.Participant.query.filter_by(failed = False, status = "approved")]
+            
+            # particle.property3 = generation
+            completed_nodes_this_generation = self.models.Particle.query.filter(
+                                                                            self.models.Particle.property3 == repr(int(network.property3)), \
+                                                                            self.models.Particle.participant_id.in_(completed_participant_ids)) \
+                                                                        .count() 
+
+            if completed_nodes_this_generation == self.generation_size:
+                network.current_generation = int(network.current_generation) + 1
+                self.recruiter.recruit(n=self.generation_size)
+
         else:
             self.recruiter.close_recruitment()

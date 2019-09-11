@@ -210,7 +210,7 @@ var resample = function() {
       });
 
       $("#hide-sample").prop('disabled', true);
-      setTimeout(function(){ $("#hide-sample").prop('disabled', false)}, 1000);
+      setTimeout(function(){ $("#hide-sample").prop('disabled', false)}, 1500);
 
     }
 

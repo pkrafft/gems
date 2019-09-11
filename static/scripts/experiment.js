@@ -36,7 +36,7 @@ var get_info = function() {
       classes = last_info.classes
 
       select = document.getElementById('classification');
-      for (var i = 0; i <= classes.length; i++){ //TODO: (PK) randomize order
+      for (var i = 0; i < classes.length; i++){ //TODO: (PK) randomize order
         var opt = document.createElement('option');
         opt.value = classes[i];
         opt.innerHTML = classes[i];

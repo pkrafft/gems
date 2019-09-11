@@ -133,6 +133,8 @@ $(document).ready(function() {
         //setTimeout(clearUpdates(), 3000)
       }
 
+      box.options[0].selected = true;
+
       $('#continue').show();
       $("#continue").prop('disabled', false);
       $("#submit-response").prop('disabled', true);

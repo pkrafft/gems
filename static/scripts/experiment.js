@@ -209,6 +209,9 @@ var resample = function() {
         hideSample();
       });
 
+      $("#hide-sample").prop('disabled', true);
+      setTimeout(function(){ $("#hide-sample").prop('disabled', false)}, 1000);
+
     }
 
 var hideSample = function() {

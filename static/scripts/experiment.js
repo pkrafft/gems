@@ -36,7 +36,7 @@ var get_info = function() {
       classes = last_info.classes
 
       select = document.getElementById('classification');
-      for (var i = 0; i <= classes.length; i++){ //TODO: (PK) randomize order
+      for (var i = 0; i < classes.length; i++){ //TODO: (PK) randomize order
         var opt = document.createElement('option');
         opt.value = classes[i];
         opt.innerHTML = classes[i];
@@ -133,6 +133,8 @@ $(document).ready(function() {
         //setTimeout(clearUpdates(), 3000)
       }
 
+      box.options[0].selected = true;
+
       $('#continue').show();
       $("#continue").prop('disabled', false);
       $("#submit-response").prop('disabled', true);
@@ -206,6 +208,9 @@ var resample = function() {
       $("#hide-sample").click(function() {
         hideSample();
       });
+
+      $("#hide-sample").prop('disabled', true);
+      setTimeout(function(){ $("#hide-sample").prop('disabled', false)}, 1500);
 
     }
 

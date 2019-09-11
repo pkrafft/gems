@@ -52,6 +52,21 @@ class ParticleFilter(Network):
         """Make current_generation queryable."""
         return cast(self.property3, Integer)
 
+    @hybrid_property
+    def decision_index(self):
+        """Make property4 decision_index."""
+        return int(self.property4)
+
+    @decision_index.setter
+    def decision_index(self, decision_index):
+        """Make decision_index settable."""
+        self.property4 = repr(decision_index)
+
+    @decision_index.expression
+    def decision_index(self):
+        """Make decision_index queryable."""
+        return cast(self.property4, Integer)
+
     # @pysnooper.snoop()
     def add_node(self, node):
         

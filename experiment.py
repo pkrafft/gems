@@ -8,6 +8,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from sqlalchemy import and_, func
+from sqlalchemy.sql.expression import cast
 from dallinger.bots import BotBase
 from dallinger.config import get_config
 from dallinger.networks import Chain
@@ -39,6 +41,10 @@ class Bartlett1932(Experiment):
         self.experiment_repeats = 1
         self.initial_recruitment_size = self.generation_size = 2
         self.generations = 2
+        self.num_practice_networks_per_experiment = 4
+        self.num_experimental_networks_per_experiment = 4
+        self.num_fixed_order_experimental_networks_per_experiment = 0
+        self.num_random_order_experimental_networks_per_experiment = 4
         if session:
             self.setup()
 
@@ -47,25 +53,35 @@ class Bartlett1932(Experiment):
         self.num_participants = config.get("num_participants")
 
     def setup(self):
-        """Setup the networks.
+        """Setup the networks"""
 
-        Setup only does stuff if there are no networks, this is so it only
-        runs once at the start of the experiment. It first calls the same
-        function in the super (see experiments.py in dallinger). Then it adds a
-        source to each network.
-        """
+        """Create the networks if they don't already exist."""
         if not self.networks():
-            super(Bartlett1932, self).setup()
-            for net in self.networks():
-                self.models.WarOfTheGhostsSource(network=net)
+            for p in range(self.num_practice_networks_per_experiment):
+                network = self.create_network(role = 'practice', decision_index = p)
+                self.models.WarOfTheGhostsSource(network=network)
+                
+            for f in range(self.num_fixed_order_experimental_networks_per_experiment):
+                decision_index = self.num_practice_networks_per_experiment + f
+                network = self.create_network(role = 'experiment', decision_index = decision_index)
+                self.models.WarOfTheGhostsSource(network=network)
+
+            for r in range(self.num_random_order_experimental_networks_per_experiment):
+                decision_index = self.num_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment + r
+                network = self.create_network(role = 'experiment', decision_index = decision_index)
+                self.models.WarOfTheGhostsSource(network=network)
+            self.session.commit()
 
     def create_node(self, network, participant):
         return self.models.Particle(network=network,participant=participant)
 
-    def create_network(self):
+    def create_network(self, role, decision_index):
         """Return a new network."""
-        # return Chain(max_size=self.num_participants)
-        return self.models.ParticleFilter(generations = self.generations, generation_size = self.generation_size)
+        net = self.models.ParticleFilter(generations = self.generations, generation_size = self.generation_size)
+        net.role = role
+        net.decision_index = decision_index
+        self.session.add(net)
+        return net
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
@@ -75,6 +91,67 @@ class Bartlett1932(Experiment):
             parent = parents[0]
             parent.transmit()
         node.receive()
+
+    # #@pysnooper.snoop()
+    def get_network_for_existing_participant(self, participant, participant_nodes):
+        """Obtain a netwokr for a participant who has already been assigned to a condition by completeing earlier rounds"""
+
+        # which networks has this participant already completed?
+        networks_participated_in = [node.network_id for node in participant_nodes]
+        
+        # How many decisions has the particiapnt already made?
+        completed_decisions = len(networks_participated_in)
+
+        # When the participant has completed all networks in their condition, their experiment is over
+        # returning None throws an error to the fronted which directs to questionnaire and completion
+        if completed_decisions == self.num_practice_networks_per_experiment + self.num_experimental_networks_per_experiment:
+            return None
+
+        nfixed = self.num_practice_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
+
+        # If the participant must still follow the fixed network order
+        if completed_decisions < nfixed:
+            # find the network that is next in the participant's schedule
+            # match on completed decsions b/c decision_index counts from zero but completed_decisions count from one
+            return self.models.Network.query.filter(self.models.Network.property4 == repr(completed_decisions)).filter_by(full = False).one()
+
+        # If it is time to sample a network at random
+        else:
+            # find networks which match the participant's condition and werent' fixed order nets
+            matched_condition_experimental_networks = self.models.Network.query.filter(cast(self.models.Network.property4, Integer) >= nfixed).filter_by(full = False).all()
+            
+            # subset further to networks not already participated in (because here decision index doesnt guide use)
+            availible_options = [net for net in matched_condition_experimental_networks if net.id not in networks_participated_in]
+            
+            # choose randomly among this set
+            chosen_network = random.choice(availible_options)
+
+        return chosen_network
+
+    # #@pysnooper.snoop(prefix = "@snoop: ")
+    def get_network_for_new_participant(self, participant):
+        key = "experiment.py >> get_network_for_new_participant ({}); ".format(participant.id)
+
+        # Return first-trial networks
+        return self.models.ParticleFilter.query.filter_by(full = False).filter(self.models.ParticleFilter.property4 == repr(0)).one_or_none()
+
+    #@pysnooper.snoop()
+    def get_network_for_participant(self, participant):
+        """Find a network for a participant."""
+        key = "experiment.py >> get_network_for_participant ({}); ".format(participant.id)
+        participant_nodes = participant.nodes()
+        if not participant_nodes:
+            chosen_network = self.get_network_for_new_participant(participant)
+        else:
+            chosen_network = self.get_network_for_existing_participant(participant, participant_nodes)
+
+        if chosen_network is not None:
+            self.log("Assigned to network: {}; Decsion Index: {};".format(chosen_network.id, chosen_network.decision_index), key)
+
+        else:
+            self.log("Requested a network but was assigned None.".format(len(participant_nodes)), key)
+
+        return chosen_network
 
     # @pysnooper.snoop()
     def recruit(self):

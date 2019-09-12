@@ -59,8 +59,34 @@ var get_info = function() {
 var create_agent = function() {
   dallinger.createAgent()
     .done(function (resp) {
+
+      if(folds) {
+        for(f of folds) {
+          $(f).hide()
+        }
+      }
+
       $('#continue').html('Continue');
       $('#continue').prop('disabled', false);
+      $('#continue').show()
+
+      $("#submit-response").html('Submit');
+
+
+      for (var i = 1; i <= 4; i++){
+        $("#evidence-" + i + "").html('');
+      }
+
+      var select = document.getElementById('classification')
+      select.options.length = 0;
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = '';
+      select.appendChild(opt);
+
+      round = 1;
+      index = 0;
+
       my_node_id = resp.node.id;
       get_info();
     })
@@ -98,7 +124,7 @@ $(document).ready(function() {
     console.log(decisions);
 
     if(round == 4) {
-      $("#submit-response").addClass('disabled');
+      $("#submit-response").prop('disabled', true);
       $("#submit-response").html('Sending...');
 
       var response = JSON.stringify({'task':task, 'shift':shift, 'classes':classes, 'tests':tests, 'choice':choice, 'decisions':decisions, 'seen':samples_seen});

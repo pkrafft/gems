@@ -9,6 +9,7 @@ var tests;
 var last_generation = [];
 var samples_seen = [];
 var decisions = [];
+var task;
 
 var get_info = function() {
   // Get info for node
@@ -25,7 +26,7 @@ var get_info = function() {
       console.log(last_info);
 
       shift = last_info.shift + 1;
-
+      task = last_info.task;
 
       if(shift == 1) {
         folds = ['#context', '#your-lab', '#your-choice', 'END'];
@@ -46,7 +47,7 @@ var get_info = function() {
       tests = last_info.tests
 
       $('#loading').html('');
-      $("#graphic").attr('src', '/static/images/berry-1.png'); // TODO: (Bill) have 8 stimuli: vary image for each 1-8
+      $("#graphic").attr('src', '/static/images/berry-' + (task + 1) + '.png'); // TODO: (Bill) have 8 stimuli: vary image for each 1-8
     })
     .fail(function (rejection) {
       console.log(rejection);
@@ -58,8 +59,34 @@ var get_info = function() {
 var create_agent = function() {
   dallinger.createAgent()
     .done(function (resp) {
+
+      if(folds) {
+        for(f of folds) {
+          $(f).hide()
+        }
+      }
+
       $('#continue').html('Continue');
       $('#continue').prop('disabled', false);
+      $('#continue').show()
+
+      $("#submit-response").html('Submit');
+
+
+      for (var i = 1; i <= 4; i++){
+        $("#evidence-" + i + "").html('');
+      }
+
+      var select = document.getElementById('classification')
+      select.options.length = 0;
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = '';
+      select.appendChild(opt);
+
+      round = 1;
+      index = 0;
+
       my_node_id = resp.node.id;
       get_info();
     })
@@ -97,10 +124,10 @@ $(document).ready(function() {
     console.log(decisions);
 
     if(round == 4) {
-      $("#submit-response").addClass('disabled');
+      $("#submit-response").prop('disabled', true);
       $("#submit-response").html('Sending...');
 
-      var response = JSON.stringify({'shift':shift, 'classes':classes, 'tests':tests, 'choice':choice, 'decisions':decisions, 'seen':samples_seen});
+      var response = JSON.stringify({'task':task, 'shift':shift, 'classes':classes, 'tests':tests, 'choice':choice, 'decisions':decisions, 'seen':samples_seen});
 
       $("#classification").disabled = true;
 

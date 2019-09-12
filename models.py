@@ -36,7 +36,7 @@ class ParticleFilter(Network):
     def generation_size(self):
         """The width of the network: the size of a single generation."""
         return int(self.property2)
-    
+
     @hybrid_property
     def current_generation(self):
         """Make property3 current_generation."""
@@ -69,7 +69,7 @@ class ParticleFilter(Network):
 
     # @pysnooper.snoop()
     def add_node(self, node):
-        
+
         node.generation = self.current_generation
 
         if self.current_generation == 0:
@@ -176,6 +176,7 @@ class WarOfTheGhostsSource(Source):
             contents['true_class'] = true_class
             contents['tests'] = tests
             contents['choice'] = ''
+            contents['task'] = self.network.decision_index
 
             contents = json.dumps(contents)
 

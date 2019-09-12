@@ -11,6 +11,8 @@ var samples_seen = [];
 var decisions = [];
 var task;
 
+var set_bit = 0;
+
 var get_info = function() {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
@@ -35,6 +37,7 @@ var get_info = function() {
       }
 
       classes = last_info.classes
+      classes = shuffle(classes);
 
       select = document.getElementById('classification');
       for (var i = 0; i < classes.length; i++){ //TODO: (PK) randomize order
@@ -47,7 +50,7 @@ var get_info = function() {
       tests = last_info.tests
 
       $('#loading').html('');
-      $("#graphic").attr('src', '/static/images/berry-' + (task + 1) + '.png'); // TODO: (Bill) have 8 stimuli: vary image for each 1-8
+      $("#graphic").attr('src', '/static/images/berry-' + (task + 1) + '.png');
     })
     .fail(function (rejection) {
       console.log(rejection);
@@ -86,6 +89,7 @@ var create_agent = function() {
 
       round = 1;
       index = 0;
+      set_bit = 0;
 
       my_node_id = resp.node.id;
       get_info();
@@ -148,11 +152,8 @@ $(document).ready(function() {
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
-        text += '<b>Your '
-        if(shift > 1) {
-          text += 'own '
-        }
-        text += 'test ' + round + ' shows that the classification is likely one of ' + tests[shift-1][round-1] + '.</b>';
+
+        text += labTest();
         // TODO: (PK) what to say when 0 or 1 tests come up positive?
 
         $("#evidence-" + round + "").html(text);
@@ -191,12 +192,11 @@ var next = function() {
       $("#alt-choice-text").hide();
     }
 
-    var text = '<b>Your ';
-    if(shift > 1) {
-      text +=  'own ';
+    if(!set_bit) {
+      var text = labTest();
+      $("#evidence-1").html(text);
+      set_bit = 1;
     }
-    text += 'lab test 1 shows that the classification is likely one of ' + tests[shift-1][0] + '.</b>';
-    $("#evidence-1").html(text);
 
     if(folds[index] != 'END') {
       $(folds[index]).show();
@@ -251,4 +251,43 @@ var clearUpdates = function() {
   $('.update').hide()
   $('.update').removeClass('update')
   $('.update').show()
+}
+
+var labTest = function() {
+
+  var these_tests = tests[shift-1][round-1]
+  these_tests = shuffle(these_tests);
+
+  var text = '';
+  text += '<b>Your '
+  if(shift > 1) {
+    text += 'own '
+  }
+  text += 'lab test ' + round + ' shows that the classification is likely one of</b> '
+  for(t of these_tests) {
+    text += '<font color="red">' + t + '</font>, '
+  }
+  text = text.slice(0, -2)
+  text += '.';
+  return(text);
+}
+
+// https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
 }

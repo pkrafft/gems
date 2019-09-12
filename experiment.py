@@ -87,12 +87,12 @@ class Bartlett1932(Experiment):
         """Add node to the chain and receive transmissions."""
         network.add_node(node)
         parents = node.neighbors(direction="from")
-        if len(parents):
-            parent = parents[0]
-            parent.transmit()
+        # if len(parents):
+        #     parent = parents[0]
+        #     parent.transmit()
         node.receive()
 
-    # #@pysnooper.snoop()
+    # @pysnooper.snoop()
     def get_network_for_existing_participant(self, participant, participant_nodes):
         """Obtain a netwokr for a participant who has already been assigned to a condition by completeing earlier rounds"""
 
@@ -153,22 +153,31 @@ class Bartlett1932(Experiment):
 
         return chosen_network
 
+    def get_current_generation(self):
+        network = self.models.ParticleFilter.query.first()
+        return repr(int(network.property3))
+
+    def rollover_generation(self):
+        for network in self.models.ParticleFilter.query.all():
+            network.current_generation = int(network.current_generation) + 1
+        self.log("Rolled over all network to generation {}".format(network.current_generation), "experiment.py >> rollover_generation: ")
+
     # @pysnooper.snoop()
     def recruit(self):
         """Recruit one participant at a time until all networks are full."""
         if self.networks(full=False):
-            network = self.models.ParticleFilter.query.one()
+            current_generation = self.get_current_generation()
 
             completed_participant_ids = [p.id for p in self.models.Participant.query.filter_by(failed = False, status = "approved")]
             
             # particle.property3 = generation
             completed_nodes_this_generation = self.models.Particle.query.filter(
-                                                                            self.models.Particle.property3 == repr(int(network.property3)), \
+                                                                            self.models.Particle.property3 == current_generation, \
                                                                             self.models.Particle.participant_id.in_(completed_participant_ids)) \
                                                                         .count() 
 
             if completed_nodes_this_generation == self.generation_size:
-                network.current_generation = int(network.current_generation) + 1
+                self.rollover_generation()
                 self.recruiter.recruit(n=self.generation_size)
 
         else:

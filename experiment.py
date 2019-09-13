@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from sqlalchemy import Integer
+from sqlalchemy import Integer, and_, func
 import random
 
 from sqlalchemy import and_, func
@@ -47,6 +47,8 @@ class Bartlett1932(Experiment):
         self.num_experimental_networks_per_experiment = 2
         self.num_fixed_order_experimental_networks_per_experiment = 0
         self.num_random_order_experimental_networks_per_experiment = 2
+        self.num_networks_per_experiment_total = self.num_practice_networks_per_experiment + self.num_random_order_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
+        self.nodes_per_generation = self.generation_size * self.num_networks_per_experiment_total
         if session:
             self.setup()
 
@@ -155,6 +157,7 @@ class Bartlett1932(Experiment):
 
         return chosen_network
 
+    # @pysnooper.snoop()
     def get_current_generation(self):
         network = self.models.ParticleFilter.query.first()
         return repr(int(network.property3))
@@ -174,11 +177,11 @@ class Bartlett1932(Experiment):
             
             # particle.property3 = generation
             completed_nodes_this_generation = self.models.Particle.query.filter(
-                                                                            self.models.Particle.property3 == current_generation, \
-                                                                            self.models.Particle.participant_id.in_(completed_participant_ids)) \
+                                                                            and_(self.models.Particle.property3 == current_generation, \
+                                                                            self.models.Particle.participant_id.in_(completed_participant_ids))) \
                                                                         .count() 
 
-            if completed_nodes_this_generation == self.generation_size:
+            if completed_nodes_this_generation == self.nodes_per_generation:
                 self.rollover_generation()
                 self.recruiter.recruit(n=self.generation_size)
 

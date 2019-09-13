@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from sqlalchemy import Integer
+import random
 
 from sqlalchemy import and_, func
 from sqlalchemy.sql.expression import cast
@@ -41,10 +43,10 @@ class Bartlett1932(Experiment):
         self.experiment_repeats = 1
         self.initial_recruitment_size = self.generation_size = 2
         self.generations = 2
-        self.num_practice_networks_per_experiment = 4
-        self.num_experimental_networks_per_experiment = 4
+        self.num_practice_networks_per_experiment = 2
+        self.num_experimental_networks_per_experiment = 2
         self.num_fixed_order_experimental_networks_per_experiment = 0
-        self.num_random_order_experimental_networks_per_experiment = 4
+        self.num_random_order_experimental_networks_per_experiment = 2
         if session:
             self.setup()
 

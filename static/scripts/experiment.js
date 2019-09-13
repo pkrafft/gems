@@ -40,7 +40,7 @@ var get_info = function() {
       classes = shuffle(classes);
 
       select = document.getElementById('classification');
-      for (var i = 0; i < classes.length; i++){ //TODO: (PK) randomize order
+      for (var i = 0; i < classes.length; i++){
         var opt = document.createElement('option');
         opt.value = classes[i];
         opt.innerHTML = classes[i];
@@ -154,7 +154,6 @@ $(document).ready(function() {
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
 
         text += labTest();
-        // TODO: (PK) what to say when 0 or 1 tests come up positive?
 
         $("#evidence-" + round + "").html(text);
 
@@ -263,12 +262,20 @@ var labTest = function() {
   if(shift > 1) {
     text += 'own '
   }
-  text += 'lab test ' + round + ' shows that the classification is likely one of</b> '
-  for(t of these_tests) {
-    text += '<font color="red">' + t + '</font>, '
+  if(these_tests.length > 1) {
+    text += 'lab test ' + round + ' shows that the classification is likely one of</b> '
+  } else if (these_tests.length == 1) {
+    text += 'lab test ' + round + ' shows that the classification is likely</b> '
+  } else {
+    text += 'lab test ' + round + ' produced no information.</b> '
   }
-  text = text.slice(0, -2)
-  text += '.';
+  if(these_tests.length > 0) {
+    for(t of these_tests) {
+      text += '<font color="red">' + t + '</font>, '
+    }
+    text = text.slice(0, -2)
+    text += '.';
+  }
   return(text);
 }
 

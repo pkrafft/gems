@@ -41,7 +41,7 @@ class Bartlett1932(Experiment):
 
         self.models = models
         self.experiment_repeats = 1
-        self.initial_recruitment_size = self.generation_size = 2
+        self.initial_recruitment_size = self.generation_size = 1
         self.generations = 2
         self.num_practice_networks_per_experiment = 2
         self.num_experimental_networks_per_experiment = 2
@@ -75,6 +75,28 @@ class Bartlett1932(Experiment):
                 network = self.create_network(role = 'experiment', decision_index = decision_index)
                 self.models.WarOfTheGhostsSource(network=network)
             self.session.commit()
+
+    def supervisor(self):
+        """Single-threaded supervisor managing recruitment decison making"""
+        key = "experiment.py >> supervisor: "
+        gevent.sleep(1.)
+        while True:
+            gevent.sleep(10.)
+            if self.end_of_generation():
+                try:
+                    self.log("Generation complete. Recrutiing new generation.", key)
+                    self.rollover_generation()
+                    self.recruiter.recruit(n=self.generation_size)
+                except Exception as e:
+                    self.log("Failed to recruit genration: {}.".format(e), key)
+
+
+    @property
+    def background_tasks(self):
+        return [
+            self.supervisor,
+        ]
+
 
     def create_node(self, network, participant):
         return self.models.Particle(network=network,participant=participant)
@@ -167,23 +189,19 @@ class Bartlett1932(Experiment):
             network.current_generation = int(network.current_generation) + 1
         self.log("Rolled over all network to generation {}".format(network.current_generation), "experiment.py >> rollover_generation: ")
 
+    def generation_complete(self):
+        current_generation = self.get_current_generation() 
+        completed_participant_ids = [p.id for p in self.models.Participant.query.filter_by(failed = False, status = "approved")]
+        
+        completed_nodes_this_generation = (self.models.Particle.query.filter(
+                                                                and_(self.models.Particle.property3 == current_generation,
+                                                                self.models.Particle.participant_id.in_(completed_participant_ids)))
+                                                                .count())
+
+        return completed_nodes_this_generation == self.nodes_per_generation
+
     # @pysnooper.snoop()
     def recruit(self):
         """Recruit one participant at a time until all networks are full."""
-        if self.networks(full=False):
-            current_generation = self.get_current_generation()
-
-            completed_participant_ids = [p.id for p in self.models.Participant.query.filter_by(failed = False, status = "approved")]
-            
-            # particle.property3 = generation
-            completed_nodes_this_generation = self.models.Particle.query.filter(
-                                                                            and_(self.models.Particle.property3 == current_generation, \
-                                                                            self.models.Particle.participant_id.in_(completed_participant_ids))) \
-                                                                        .count() 
-
-            if completed_nodes_this_generation == self.nodes_per_generation:
-                self.rollover_generation()
-                self.recruiter.recruit(n=self.generation_size)
-
-        else:
+        if not self.networks(full=False):
             self.recruiter.close_recruitment()

@@ -40,7 +40,7 @@
             <div class="row">
                 <div class="col-xs-10"></div>
                 <div class="col-xs-2">
-                    <button type="button" class="btn btn-success btn-lg" onClick="dallinger.goToPage('experiment')">
+                    <button type="button" class="btn btn-success btn-lg" onClick="advance()">
                     Begin</button>
                 </div>
             </div>
@@ -50,6 +50,16 @@
 
 {% block scripts %}
     <script>
-        dallinger.createParticipant();
+
+        advance = function (){
+
+            $(document).ready(function () {
+                dallinger.createParticipant()
+                .done(function (response) {
+                    dallinger.goToPage('attention-check')
+                })
+            })
+        }
+
     </script>
 {% endblock %}

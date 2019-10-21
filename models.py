@@ -13,6 +13,8 @@ import random
 import json
 # import pysnooper
 
+import words
+
 SINGLEPARENT = False
 
 class ParticleFilter(Network):
@@ -146,8 +148,8 @@ class WarOfTheGhostsSource(Source):
 
             contents = {}
 
-            # http://www.dialectcreator.com/
-            classes = ['luthe','ovuwal','yiathy','oob','bakasho','ese','iydo','imoy']
+
+            classes = random.sample(words.words, 8)
 
             n_turns = 20
             n_classes = len(classes)

@@ -41,12 +41,12 @@ class Bartlett1932(Experiment):
 
         self.models = models
         self.experiment_repeats = 1
-        self.initial_recruitment_size = self.generation_size = 2
-        self.generations = 2
-        self.num_practice_networks_per_experiment = 2
-        self.num_experimental_networks_per_experiment = 2
+        self.initial_recruitment_size = self.generation_size = 4
+        self.generations = 4
+        self.num_practice_networks_per_experiment = 4
+        self.num_experimental_networks_per_experiment = 4
         self.num_fixed_order_experimental_networks_per_experiment = 0
-        self.num_random_order_experimental_networks_per_experiment = 2
+        self.num_random_order_experimental_networks_per_experiment = 4
         self.num_networks_per_experiment_total = self.num_practice_networks_per_experiment + self.num_random_order_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
         self.nodes_per_generation = self.generation_size * self.num_networks_per_experiment_total
         if session:

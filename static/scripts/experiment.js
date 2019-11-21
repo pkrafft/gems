@@ -6,9 +6,9 @@ var folds;
 var shift;
 var classes;
 var tests;
-var last_generation = [];
-var samples_seen = [];
-var decisions = [];
+var last_generation;
+var samples_seen;
+var decisions;
 var task;
 
 var set_bit = 0;
@@ -17,6 +17,13 @@ var get_info = function() {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
     .done(function (resp) {
+
+      last_generation = [];
+      samples_seen = [];
+      decisions = [];
+
+      $("#nextsample").html('');
+      $("#resample-text").hide();
 
       var last_info;
       for (var i = 0; i < resp.infos.length; i++) {

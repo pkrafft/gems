@@ -64,7 +64,7 @@ class Bartlett1932(Experiment):
             for p in range(self.num_practice_networks_per_experiment):
                 network = self.create_network(role = 'practice', decision_index = p)
                 self.models.WarOfTheGhostsSource(network=network)
-                
+
             for f in range(self.num_fixed_order_experimental_networks_per_experiment):
                 decision_index = self.num_practice_networks_per_experiment + f
                 network = self.create_network(role = 'experiment', decision_index = decision_index)
@@ -102,7 +102,7 @@ class Bartlett1932(Experiment):
 
         # which networks has this participant already completed?
         networks_participated_in = [node.network_id for node in participant_nodes]
-        
+
         # How many decisions has the particiapnt already made?
         completed_decisions = len(networks_participated_in)
 
@@ -123,10 +123,10 @@ class Bartlett1932(Experiment):
         else:
             # find networks which match the participant's condition and werent' fixed order nets
             matched_condition_experimental_networks = self.models.Network.query.filter(cast(self.models.Network.property4, Integer) >= nfixed).filter_by(full = False).all()
-            
+
             # subset further to networks not already participated in (because here decision index doesnt guide use)
             availible_options = [net for net in matched_condition_experimental_networks if net.id not in networks_participated_in]
-            
+
             # choose randomly among this set
             chosen_network = random.choice(availible_options)
 
@@ -174,12 +174,12 @@ class Bartlett1932(Experiment):
             current_generation = self.get_current_generation()
 
             completed_participant_ids = [p.id for p in self.models.Participant.query.filter_by(failed = False, status = "approved")]
-            
+
             # particle.property3 = generation
             completed_nodes_this_generation = self.models.Particle.query.filter(
                                                                             and_(self.models.Particle.property3 == current_generation, \
                                                                             self.models.Particle.participant_id.in_(completed_participant_ids))) \
-                                                                        .count() 
+                                                                        .count()
 
             if completed_nodes_this_generation == self.nodes_per_generation:
                 self.rollover_generation()

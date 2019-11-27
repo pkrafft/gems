@@ -42,7 +42,7 @@ class Bartlett1932(Experiment):
         self.models = models
         self.experiment_repeats = 1
         self.initial_recruitment_size = self.generation_size = 4
-        self.generations = 4
+        self.generations = 2
         self.num_practice_networks_per_experiment = 4
         self.num_experimental_networks_per_experiment = 4
         self.num_fixed_order_experimental_networks_per_experiment = 0

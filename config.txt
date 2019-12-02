@@ -1,5 +1,5 @@
 [Experiment]
-mode = sandbox
+mode = live
 auto_recruit = true
 webdriver_type = phantomjs
 num_participants = 3

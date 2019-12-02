@@ -129,6 +129,7 @@
   <script type="text/javascript">
   var number_of_allowed_attempts = 3
   var number_of_attempts = 0
+  localStorage.setItem("gemquizattempts", 0)
 
   proceed = function () {
     dallinger.allowExit();
@@ -169,6 +170,7 @@
   }
 
   updateFeedback = function (passed) {
+    localStorage.setItem("gemquizattempts", parseInt(localStorage.getItem("gemquizattempts")) + 1)
     if (passed) {
       $("#questions-div").hide()
       $("#instructions-div-success").attr("style", "visibility:visible")

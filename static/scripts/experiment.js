@@ -4,7 +4,7 @@ var index = 0;
 var folds;
 
 var shift;
-var classes;
+var classes, true_class;
 var tests;
 var last_generation;
 var samples_seen;
@@ -45,6 +45,8 @@ var get_info = function() {
 
       classes = last_info.classes
       classes = shuffle(classes);
+
+      true_class = last_info.true_class
 
       select = document.getElementById('classification');
       for (var i = 0; i < classes.length; i++){
@@ -138,7 +140,7 @@ $(document).ready(function() {
       $("#submit-response").prop('disabled', true);
       $("#submit-response").html('Sending...');
 
-      var response = JSON.stringify({'task':task, 'shift':shift, 'classes':classes, 'tests':tests, 'choice':choice, 'decisions':decisions, 'seen':samples_seen});
+      var response = JSON.stringify({'task':task, 'shift':shift, 'quiz_attempts': localStorage.getItem("gemquizattempts"), 'classes':classes, "true_class":true_class, 'tests':tests, 'choice':choice, 'decisions':decisions, 'seen':samples_seen});
 
       $("#classification").disabled = true;
 

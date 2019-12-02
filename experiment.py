@@ -174,6 +174,7 @@ class Bartlett1932(Experiment):
 
     # @pysnooper.snoop()
     def recruit(self):
+        key = "experiment.py >> recruit: "
         """Recruit one participant at a time until all networks are full."""
         if self.networks(full=False):
             current_generation = self.get_current_generation()
@@ -185,8 +186,10 @@ class Bartlett1932(Experiment):
                                                                             and_(self.models.Particle.property3 == current_generation, \
                                                                             self.models.Particle.participant_id.in_(completed_participant_ids))) \
                                                                         .count()
+            self.log("G: {}; Approved ps: {} Required ps: {}".format(current_generation, int(float(completed_nodes_this_generation) / float(self.num_experimental_networks_per_experiment + self.num_practice_networks_per_experiment)), self.generation_size), key)
 
             if completed_nodes_this_generation == self.nodes_per_generation:
+                self.log("Generation Complete. Rolling over and recruiting.", key)
                 self.rollover_generation()
                 self.recruiter.recruit(n=self.generation_size)
 

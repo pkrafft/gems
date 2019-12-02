@@ -25,6 +25,8 @@ def extra_parameters():
     config = get_config()
     config.register("num_participants", int)
 
+DEBUG = True
+
 
 class Bartlett1932(Experiment):
     """Define the structure of the experiment."""
@@ -40,13 +42,14 @@ class Bartlett1932(Experiment):
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
 
         self.models = models
+        self.bonus_amount = 0.5
         self.experiment_repeats = 1
-        self.initial_recruitment_size = self.generation_size = 4
+        self.initial_recruitment_size = self.generation_size = 2
         self.generations = 2
-        self.num_practice_networks_per_experiment = 4
-        self.num_experimental_networks_per_experiment = 4
+        self.num_practice_networks_per_experiment = 1 if DEBUG else 4
         self.num_fixed_order_experimental_networks_per_experiment = 0
-        self.num_random_order_experimental_networks_per_experiment = 4
+        self.num_random_order_experimental_networks_per_experiment = 1 if DEBUG else 4
+        self.num_experimental_networks_per_experiment = self.num_fixed_order_experimental_networks_per_experiment + self.num_random_order_experimental_networks_per_experiment
         self.num_networks_per_experiment_total = self.num_practice_networks_per_experiment + self.num_random_order_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
         self.nodes_per_generation = self.generation_size * self.num_networks_per_experiment_total
         if session:
@@ -71,7 +74,7 @@ class Bartlett1932(Experiment):
                 self.models.WarOfTheGhostsSource(network=network)
 
             for r in range(self.num_random_order_experimental_networks_per_experiment):
-                decision_index = self.num_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment + r
+                decision_index = self.num_practice_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment + r
                 network = self.create_network(role = 'experiment', decision_index = decision_index)
                 self.models.WarOfTheGhostsSource(network=network)
             self.session.commit()
@@ -187,3 +190,18 @@ class Bartlett1932(Experiment):
 
         else:
             self.recruiter.close_recruitment()
+
+    def bonus(self, participant):
+        infos = participants.infos()
+        successes = []
+        for info in infos:
+            data = json.loads(info.contents)
+
+            # only count test trials
+            if data["task"] >= self.num_practice_networks_per_experiment:
+                if "choice" in data.keys() and "true_class" in data.keys():
+                    successes.append(int(data["choice"] == data["true_class"]))
+        success_rate = float(sum(successes)) / float(len(successes))
+        return min([self.bonus_amount, self.bonus_amount * success_rate])
+
+

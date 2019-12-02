@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from sqlalchemy import Integer, and_, func
 import random
+import json
 
 from sqlalchemy import and_, func
 from sqlalchemy.sql.expression import cast
@@ -168,6 +169,7 @@ class Bartlett1932(Experiment):
     def rollover_generation(self):
         for network in self.models.ParticleFilter.query.all():
             network.current_generation = int(network.current_generation) + 1
+        self.session.commit()
         self.log("Rolled over all network to generation {}".format(network.current_generation), "experiment.py >> rollover_generation: ")
 
     # @pysnooper.snoop()
@@ -192,7 +194,7 @@ class Bartlett1932(Experiment):
             self.recruiter.close_recruitment()
 
     def bonus(self, participant):
-        infos = participants.infos()
+        infos = participant.infos()
         successes = []
         for info in infos:
             data = json.loads(info.contents)

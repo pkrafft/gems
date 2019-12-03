@@ -195,9 +195,17 @@ class Bartlett1932(Experiment):
 
         else:
             self.recruiter.close_recruitment()
+    
+    def data_check(self, participant):
+        infos = participant.infos()
+        if len(infos) < self.num_practice_networks_per_experiment + self.num_experimental_networks_per_experiment:
+            return False
+        return True
 
     def bonus(self, participant):
         infos = participant.infos()
+        if not infos:
+            return 0
         successes = []
         for info in infos:
             data = json.loads(info.contents)
@@ -206,6 +214,8 @@ class Bartlett1932(Experiment):
             if data["task"] >= self.num_practice_networks_per_experiment:
                 if "choice" in data.keys() and "true_class" in data.keys():
                     successes.append(int(data["choice"] == data["true_class"]))
+        if len(successes) == 0:
+            return 0
         success_rate = float(sum(successes)) / float(len(successes))
         return min([self.bonus_amount, self.bonus_amount * success_rate])
 

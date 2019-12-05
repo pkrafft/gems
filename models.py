@@ -155,8 +155,8 @@ class WarOfTheGhostsSource(Source):
             n_classes = len(classes)
             n_evidence = 4
 
-            true_prob = 0.6
-            false_prob = 0.5
+            true_prob = 0.7
+            false_prob = 0.4
 
             true_class = random.choice(classes);
 

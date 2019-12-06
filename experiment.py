@@ -45,7 +45,7 @@ class Bartlett1932(Experiment):
         self.models = models
         self.bonus_amount = 0.5
         self.experiment_repeats = 1
-        self.initial_recruitment_size = self.generation_size = 10
+        self.initial_recruitment_size = self.generation_size = 20
         self.generations = 3
         self.num_practice_networks_per_experiment = 1 if DEBUG else 4
         self.num_fixed_order_experimental_networks_per_experiment = 0

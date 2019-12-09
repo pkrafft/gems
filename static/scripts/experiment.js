@@ -13,6 +13,7 @@ var task;
 
 var set_bit = 0;
 
+
 var get_info = function() {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
@@ -54,6 +55,34 @@ var get_info = function() {
         opt.value = classes[i];
         opt.innerHTML = classes[i];
         select.appendChild(opt);
+      }
+
+      var table_html = ''
+      table_html += '<table><tr>'
+      table_html += '<th align="center"></th>'
+      for (var i = 0; i < classes.length; i++){
+        table_html += '<th>Class ' + (i + 1) + '</th>'
+      }
+      table_html += '</tr><tr><th align="center">Name</th>'
+      for(var c of classes) {
+        table_html += '<th>' + c + '</th>'
+      }
+      table_html += '</tr><tr><td><b>Choice</b></td>'
+      for(var c of classes) {
+        table_html += '<td id="radio-class-' + c + '">'
+        table_html += '<input type="radio" id="class-' + c + '-yes" name="class-' + c + '" value="yes">' + get_image('checkmark', 'img-' + c + '-yes') + '<br>'
+        table_html += '<input type="radio" id="class-' + c + '-no" name="class-' + c + '" value="no">' + get_image('xmark', 'img-' + c + '-no') + '<br>'
+        table_html += '</td>'
+      }
+      table_html += '</tr></table>'
+
+      $("#classification-table").html(table_html);
+
+      for(var c of classes) {
+        var checkbutton = document.getElementById("img-" + c + "-yes");
+        checkbutton.addEventListener("click", toggle('class-' + c + '-yes'));
+        var xbutton = document.getElementById("img-" + c + "-no");
+        xbutton.addEventListener("click", toggle('class-' + c + '-no'));
       }
 
       tests = last_info.tests
@@ -124,16 +153,25 @@ $(document).ready(function() {
 
   $("#submit-response").click(function() {
 
-    var box = document.getElementById("classification");
-    var choice = box.options[box.selectedIndex].text;
+    //var box = document.getElementById("classification");
+    //var choice = box.options[box.selectedIndex].text;
 
-
-    if(choice == '') {
-      window.alert('Please select a value.');
-      return
+    var choice = [];
+    for(c of classes) {
+      if(!$("input:radio[name=class-" + c + "]").is(":checked")){
+        window.alert('Please select a value for ' + c + '.');
+        return
+      }
+      var checked = document.querySelector("input[name=class-" + c + "]:checked").value;
+      if(checked == 'yes') {
+        choice.push(c);
+      }
     }
 
+    console.log(choice);
+
     decisions.push([round, choice]);
+    console.log('Decisions')
     console.log(decisions);
 
     if(round == 4) {
@@ -162,14 +200,16 @@ $(document).ready(function() {
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
 
-        text += labTest();
+        //text += labTest();
+        labTest();
+        text += 'The results from your Test ' + round + ' are in your data table above!';
 
         $("#evidence-" + round + "").html(text);
 
         //setTimeout(clearUpdates(), 3000)
       }
 
-      box.options[0].selected = true;
+      //box.options[0].selected = true;
 
       $('#continue').show();
       $("#continue").prop('disabled', false);
@@ -191,7 +231,7 @@ var next = function() {
       var prior_sample = last_generation[Math.floor(Math.random()*last_generation.length)];
       var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
 
-      var prev_table = prev_to_table([prior_sample]);
+      var prev_table = prev_to_table(prior_sample);
       $("#previous-text").html('<p><b>Notes from shift ' + (shift - 1) + ' indicate that another technician, building on previous shifts and using their own tests, thought the classification were:</b></p>' + prev_table);
 
       samples_seen.push([round,prior_sample]);
@@ -204,23 +244,27 @@ var next = function() {
     if(!set_bit) {
 
       var text = '';
-      text += '<b>Your '
+      text += '<p><b>Your '
       if(shift > 1) {
         text += 'own '
       }
-      text += 'lab tests are shown in the following table.</br>'
+      text += 'lab tests are shown in the following table.</b></p>'
 
       var table_html = ''
       table_html += text
       table_html += '<table><tr>'
-      table_html += '<th></th>'
+      table_html += '<th align="center"></th>'
+      for (var i = 0; i < classes.length; i++){
+        table_html += '<th>Class ' + (i + 1) + '</th>'
+      }
+      table_html += '</tr><tr><th align="center">Name</th>'
       for(var c of classes) {
         table_html += '<th>' + c + '</th>'
       }
       for (var i = 1; i <= 4; i++){
         table_html += '</tr><tr><td><b>Test ' + i + '</b></td>'
         for(var c of classes) {
-          table_html += '<td id=cell-' + i + '-' + c + '></td>'
+          table_html += '<td id="cell-' + i + '-' + c + '"></td>'
         }
       }
       table_html += '</tr></table>'
@@ -229,8 +273,10 @@ var next = function() {
 
       labTest();
 
+      var text = 'The results from your Test ' + round + ' are in your data table above!';
+
       //var text = labTest();
-      //$("#evidence-1").html(text);
+      $("#evidence-1").html(text);
       set_bit = 1;
     }
 
@@ -256,7 +302,7 @@ var resample = function() {
 
       var prior_sample = last_generation[Math.floor(Math.random()*last_generation.length)];
       //var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
-      var prev_table = prev_to_table([prior_sample]);
+      var prev_table = prev_to_table(prior_sample);
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
@@ -294,20 +340,23 @@ var clearUpdates = function() {
 var prev_to_table = function(choice_list) {
   var table_html = ''
   table_html += '<table><tr>'
-  table_html += '<th></th>'
+  table_html += '<th align="center"></th>'
+  for (var i = 0; i < classes.length; i++){
+    table_html += '<th>Class ' + (i + 1) + '</th>'
+  }
+  table_html += '</tr><tr><th align="center">Name</th>'
   for(var c of classes) {
     table_html += '<th>' + c + '</th>'
   }
   table_html += '</tr><tr><td>Prior</td>'
   for(var c of classes) {
-    var image = '<img src="/static/images/'
+    var image;
     if(choice_list.includes(c)) {
-      image += 'checkmark.png" alt="checkmark"'
+      image = get_image('checkmark', 'prior');
     } else {
-      image += 'xmark.png" alt="xmark"'
+      image = get_image('xmark', 'prior');
     }
-    image += ' border="1" height="20" width="20" />'
-    table_html += '<td align="center" id=prev-'+ c + '>' +  image + '</td>'
+    table_html += '<td align="center" id="prev-'+ c + '">' +  image + '</td>'
   }
   table_html += '</tr></table>'
 
@@ -321,9 +370,9 @@ var labTest = function() {
 
   for(c of classes) {
     if(these_tests.includes(c)) {
-      document.getElementById('cell-' + round + '-' + c).style.backgroundColor='#009e73';
+      document.getElementById('cell-' + round + '-' + c).style.backgroundColor='#5fd25f';
     } else {
-      document.getElementById('cell-' + round + '-' + c).style.backgroundColor='#d55e00';
+      document.getElementById('cell-' + round + '-' + c).style.backgroundColor='#900000';
     }
   }
 
@@ -362,4 +411,13 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+function get_image(name, image_id) {
+  var this_image = '<img id="' + image_id + '" src="/static/images/' + name + '.png" alt="' + name + '" border="1" height="25" width="25" />'
+  return(this_image)
+}
+
+function toggle(button_id){
+  return(function(){document.getElementById(button_id).checked = true;})
 }

@@ -191,7 +191,8 @@ var next = function() {
       var prior_sample = last_generation[Math.floor(Math.random()*last_generation.length)];
       var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
 
-      $("#previous").html('<p><b>Notes from shift ' + (shift - 1) + ' indicate that another technician, building on previous shifts and using their own tests, thought the classification was</b> ' + prior + '.</p>');
+      var prev_table = prev_to_table([prior_sample]);
+      $("#previous-text").html('<p><b>Notes from shift ' + (shift - 1) + ' indicate that another technician, building on previous shifts and using their own tests, thought the classification were:</b></p>' + prev_table);
 
       samples_seen.push([round,prior_sample]);
       console.log(samples_seen);
@@ -201,8 +202,35 @@ var next = function() {
     }
 
     if(!set_bit) {
-      var text = labTest();
-      $("#evidence-1").html(text);
+
+      var text = '';
+      text += '<b>Your '
+      if(shift > 1) {
+        text += 'own '
+      }
+      text += 'lab tests are shown in the following table.</br>'
+
+      var table_html = ''
+      table_html += text
+      table_html += '<table><tr>'
+      table_html += '<th></th>'
+      for(var c of classes) {
+        table_html += '<th>' + c + '</th>'
+      }
+      for (var i = 1; i <= 4; i++){
+        table_html += '</tr><tr><td><b>Test ' + i + '</b></td>'
+        for(var c of classes) {
+          table_html += '<td id=cell-' + i + '-' + c + '></td>'
+        }
+      }
+      table_html += '</tr></table>'
+
+      $("#evidence-table").html(table_html);
+
+      labTest();
+
+      //var text = labTest();
+      //$("#evidence-1").html(text);
       set_bit = 1;
     }
 
@@ -227,12 +255,14 @@ var resample = function() {
       $("#resample-text").hide()
 
       var prior_sample = last_generation[Math.floor(Math.random()*last_generation.length)];
-      var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
+      //var prior = '<select><option selected="selected" disabled>' + prior_sample + '</option></select>';
+      var prev_table = prev_to_table([prior_sample]);
 
         var text = '';
         text += '<div style="display: inline" class="update"><font color="red"><b>Update!</b></font> </div>';
-      text += 'Further notes from shift ' + (shift - 1) +  ' indicate that a technician, building on previous shifts and using their own tests, thought the classification was ' + prior + '. ';
+      text += 'Further notes from shift ' + (shift - 1) +  ' indicate that a technician, building on previous shifts and using their own tests, thought the classification was: ';
       text += '<button id="hide-sample" type="button" class="btn btn-info btn-sm">HIDE</button></p>';
+      text += prev_table;
 
       $('#nextsample').show();
       $("#nextsample").html(text);
@@ -261,31 +291,57 @@ var clearUpdates = function() {
   $('.update').show()
 }
 
+var prev_to_table = function(choice_list) {
+  var table_html = ''
+  table_html += '<table><tr>'
+  table_html += '<th></th>'
+  for(var c of classes) {
+    table_html += '<th>' + c + '</th>'
+  }
+  table_html += '</tr><tr><td>Prior</td>'
+  for(var c of classes) {
+    var image = '<img src="/static/images/'
+    if(choice_list.includes(c)) {
+      image += 'checkmark.png" alt="checkmark"'
+    } else {
+      image += 'xmark.png" alt="xmark"'
+    }
+    image += ' border="1" height="20" width="20" />'
+    table_html += '<td align="center" id=prev-'+ c + '>' +  image + '</td>'
+  }
+  table_html += '</tr></table>'
+
+  return(table_html);
+}
+
 var labTest = function() {
 
   var these_tests = tests[shift-1][round-1]
   these_tests = shuffle(these_tests);
 
-  var text = '';
-  text += '<b>Your '
-  if(shift > 1) {
-    text += 'own '
-  }
-  if(these_tests.length > 1) {
-    text += 'lab test ' + round + ' shows that the classification is likely one of</b> '
-  } else if (these_tests.length == 1) {
-    text += 'lab test ' + round + ' shows that the classification is likely</b> '
-  } else {
-    text += 'lab test ' + round + ' produced no information.</b> '
-  }
-  if(these_tests.length > 0) {
-    for(t of these_tests) {
-      text += '<font color="red">' + t + '</font>, '
+  for(c of classes) {
+    if(these_tests.includes(c)) {
+      document.getElementById('cell-' + round + '-' + c).style.backgroundColor='#009e73';
+    } else {
+      document.getElementById('cell-' + round + '-' + c).style.backgroundColor='#d55e00';
     }
-    text = text.slice(0, -2)
-    text += '.';
   }
-  return(text);
+
+  // if(these_tests.length > 1) {
+  //   text += 'lab test ' + round + ' shows that the classification is likely one of</b> '
+  // } else if (these_tests.length == 1) {
+  //   text += 'lab test ' + round + ' shows that the classification is likely</b> '
+  // } else {
+  //   text += 'lab test ' + round + ' produced no information.</b> '
+  // }
+  // if(these_tests.length > 0) {
+  //   for(t of these_tests) {
+  //     text += '<font color="red">' + t + '</font>, '
+  //   }
+  //   text = text.slice(0, -2)
+  //   text += '.';
+  // }
+  // return(text);
 }
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array

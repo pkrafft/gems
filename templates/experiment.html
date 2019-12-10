@@ -3,7 +3,7 @@
 {% block head %}
 <style>
 table, th, td {
-  border: 1px solid black;
+  border: 3px solid black;
 }
 th, td {
   padding: 10px;
@@ -33,20 +33,21 @@ th, td {
           <div id="your-choice" style="display:none;">
             <h4>Classification</h4>
             <div id="choice-text" style="display:none;">
-              <p><b>What do you think the classifications of this gem are?</b></br><i>[To see the opinion of another technician from the previous shift click <a onclick="resample();">here</a>.</i>]</p>
+              <p>What do you think the classifications of this gem are?</br><b>[To see the opinion of another technician from the previous shift click <a onclick="resample();">here</a>.</b>]</p>
             </div>
-            <div id="alt-choice-text"><p><b>What do you think the classifications of this gem are?</b></p></div>
+            <div id="alt-choice-text"><p>What do you think the classifications of this gem are?</p></div>
+            <div id="classification-table"></div>
             <div>
               <p>
-              <select name="classification" id="classification">
+              <!-- <select name="classification" id="classification">
                 <option selected="selected"></option>
-              </select>
+              </select> -->
               <button id="submit-response" type="button" class="btn btn-primary" disabled="disabled">Submit</button>
             </p>
             </div>
             <div id="nextsample"></div>
             <div id="resample-text"  style="display:none;">
-              To see the notes of another technician from the previous shift click <a onclick="resample();">here</a>.
+              <b>To see the notes of another technician from the previous shift click <a onclick="resample();">here</a></b>.
             </div>
           </br></br>
             </div>

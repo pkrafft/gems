@@ -2,13 +2,13 @@
 
 {% block stylesheets %}
     <link rel=stylesheet href="/static/css/bootstrap.min.css" type="text/css">
-    <link rel='stylesheet' type='text/css' href='/static/css/custom.css'/>  
+    <link rel='stylesheet' type='text/css' href='/static/css/custom.css'/>
 {% endblock %}
 
 {% block body %}
     <div class="main_div" id="questions-div">
         <h1>Questions</h1>
-        
+
         <div class="main_div">
             <form>
             	{% block replace_questions %}
@@ -21,9 +21,9 @@
 	                    <div class="col-md-4">
 	                        <select id="q1" name="q1">
 	                            <option value="9">Three</option>
-                              <option value="10">One</option>
+                              <option value="5">One</option>
                               <option value="8">Two</option>
-	                            <option value="5" SELECTED>None of these options</option>
+	                            <option value="10" SELECTED>None of these options</option>
 	                        </select>
 	                    </div>
 	                </div>
@@ -38,7 +38,7 @@
                               <option value="7">10%</option>
                               <option value="9">100%</option>
                               <option value="8">2000%</option>
-                              <option value="10">60%</option> 
+                              <option value="10">60%</option>
                               <option value="5" SELECTED>None of these options</option>
 	                        </select>
 	                    </div>
@@ -65,7 +65,7 @@
                       </div>
                       <div class="col-md-4">
                           <select id="q4" name="q4">
-                              <option value="10">20%</option>
+                              <option value="10">30%</option>
                               <option value="9">0%</option>
                               <option value="8">10%</option>
                               <option value="5" SELECTED>None of these options</option>
@@ -91,7 +91,7 @@
 
 <!-- Instructions Div -->
 <div  class="main_div"  id="instructions-div-success" style="visibility:hidden">
-    
+
     <span id="instructions-text-1">Thank you.</span>
     <br>
     <span id="instructions-text-2">Please click Continue to begin.</span>
@@ -102,19 +102,19 @@
 
 <!-- Instructions Div -->
 <div  class="main_div"  id="instructions-div-failure" style="visibility:hidden">
-    
+
     <span id="instructions-text-1">You did not answer all of the questions correctly.</span>
     <br>
     <span id="instructions-text-2">Here are some important points about the game: </span>
     <br>
     <hr>
-    <span id="instructions-text-3">1) Each gem has exactly one true classification. </span>
+    <span id="instructions-text-3">1) Each gem has can have any number of true classifications. </span>
     <br>
-    <span id="instructions-text-4">2) The true classification has a 60% chance of appearing in each test.</span>
+    <span id="instructions-text-4">2) The true classification has a 60% chance of producing positive evidence in each test.</span>
     <br>
     <span id="instructions-text-5">3) You will classify eight gems in total. </span>
     <br>
-    <span id="instructions-text-6">4) Incorrect classifications have a 20% chance of apoearing in each test.</span>
+    <span id="instructions-text-6">4) Incorrect classifications have a 30% chance of apoearing in each test.</span>
     <br>
     <hr>
     <span id="instructions-text-2">Please click Continue to answer the questions again.</span>
@@ -164,8 +164,8 @@
     });
 
     const passed = checkAnswers(formDict)
-    spinner.unfreeze();  
-    dallinger.allowExit(); 
+    spinner.unfreeze();
+    dallinger.allowExit();
     updateFeedback(passed)
   }
 
@@ -181,7 +181,7 @@
         dallinger.goToPage('questionnaire')
       }
       else {
-        $("#questions-div").hide() 
+        $("#questions-div").hide()
         $("#instructions-div-failure").attr("style", "visibility:visible")
       }
     }
@@ -192,7 +192,7 @@
             $("#submit-pregame-questions").click(function() {
                 submitQuestions()
               });
-          
+
         })
   </script>
 {% endblock %}

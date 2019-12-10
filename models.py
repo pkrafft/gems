@@ -156,9 +156,10 @@ class WarOfTheGhostsSource(Source):
             n_evidence = 4
 
             true_prob = 0.6
-            false_prob = 0.2
+            false_prob = 0.3
 
-            true_class = random.choice(classes);
+            #true_class = random.choice(classes);
+            true_classes = [c for c in classes if random.random() < 0.5]
 
             tests = []
             for t in range(n_turns):
@@ -166,7 +167,7 @@ class WarOfTheGhostsSource(Source):
                 for i in range(n_evidence):
                     tests[t] += [[]]
                     for c in classes:
-                        if c == true_class:
+                        if c in true_classes:
                             prob = true_prob
                         else:
                             prob = false_prob
@@ -175,7 +176,7 @@ class WarOfTheGhostsSource(Source):
 
             contents['shift'] = 0
             contents['classes'] = classes
-            contents['true_class'] = true_class
+            contents['true_class'] = true_classes
             contents['tests'] = tests
             contents['choice'] = ''
             contents['task'] = self.network.decision_index

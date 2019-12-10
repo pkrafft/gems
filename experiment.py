@@ -26,7 +26,7 @@ def extra_parameters():
     config = get_config()
     config.register("num_participants", int)
 
-DEBUG = False
+DEBUG = True
 
 
 class Bartlett1932(Experiment):
@@ -45,11 +45,11 @@ class Bartlett1932(Experiment):
         self.models = models
         self.bonus_amount = 0.5
         self.experiment_repeats = 1
-        self.initial_recruitment_size = self.generation_size = 20
+        self.initial_recruitment_size = self.generation_size = 1
         self.generations = 3
         self.num_practice_networks_per_experiment = 1 if DEBUG else 4
         self.num_fixed_order_experimental_networks_per_experiment = 0
-        self.num_random_order_experimental_networks_per_experiment = 1 if DEBUG else 4
+        self.num_random_order_experimental_networks_per_experiment = 0 if DEBUG else 4
         self.num_experimental_networks_per_experiment = self.num_fixed_order_experimental_networks_per_experiment + self.num_random_order_experimental_networks_per_experiment
         self.num_networks_per_experiment_total = self.num_practice_networks_per_experiment + self.num_random_order_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
         self.nodes_per_generation = self.generation_size * self.num_networks_per_experiment_total
@@ -195,7 +195,7 @@ class Bartlett1932(Experiment):
 
         else:
             self.recruiter.close_recruitment()
-    
+
     def data_check(self, participant):
         infos = participant.infos()
         if len(infos) < self.num_practice_networks_per_experiment + self.num_experimental_networks_per_experiment:
@@ -213,10 +213,13 @@ class Bartlett1932(Experiment):
             # only count test trials
             if data["task"] >= self.num_practice_networks_per_experiment:
                 if "choice" in data.keys() and "true_class" in data.keys():
-                    successes.append(int(data["choice"] == data["true_class"]))
+                    n_classes = len(data["classes"])
+                    true_pos = len(set(data["choice"]).intersection(data["true_class"]))
+                    total_neg = n_classes - len(data["true_class"])
+                    false_pos = len(set(data["choice"]) - set(data["true_class"]))
+                    true_neg = total_neg - false_pos
+                    successes.append((true_pos + true_neg)/8.0)
         if len(successes) == 0:
             return 0
         success_rate = float(sum(successes)) / float(len(successes))
         return min([self.bonus_amount, self.bonus_amount * success_rate])
-
-

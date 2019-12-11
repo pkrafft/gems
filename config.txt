@@ -5,10 +5,10 @@ webdriver_type = phantomjs
 num_participants = 3
 
 [MTurk]
-title = Gem Classification Experiment Alpha (5 - 10 mins; Bonus up to $0.50)
+title = Gem Classification Experiment Alpha (5 - 15 mins; Bonus up to $0.50)
 description = Play a brief gem classification game
 keywords = Psychology, games
-base_payment = 1.50
+base_payment = 1.75
 lifetime = 24
 duration = 0.5
 us_only = true

@@ -3,6 +3,7 @@ from dallinger.nodes import Agent
 from dallinger.models import Info
 from dallinger.models import Network, Node, Participant
 from dallinger.recruiters import MTurkRecruiter # TODO: is the recruiter fixed?
+from dallinger import db
 
 from sqlalchemy import Integer, String, Float
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -73,6 +74,7 @@ class ParticleFilter(Network):
     def add_node(self, node):
 
         node.generation = self.current_generation
+        db.session.commit()
 
         if self.current_generation == 0:
             parent = self._select_oldest_source()
@@ -86,7 +88,15 @@ class ParticleFilter(Network):
                 sampled_parent.connect(whom=node)
                 sampled_parent.transmit(to_whom=node)
             else:
-                parents = list(filter(lambda node: int(node.generation) == int(self.current_generation) - 1, self.nodes(failed=False, type=Particle)))
+                # parents = list(filter(lambda node: int(node.generation) == int(self.current_generation) - 1, self.nodes(failed=False, type=Particle)))
+
+                parents = (
+                    Particle.query
+                    .filter(Particle.network_id == self.id)
+                    .filter(Particle.property3 == repr(int(self.current_generation) - 1))
+                    .filter_by(failed = False)
+                    .all()
+                )
                 for parent in parents:
                     parent.connect(whom=node)
                     parent.transmit(to_whom=node)

@@ -32,8 +32,8 @@ var get_info = function() {
         last_generation.push(last_info.choice);
       }
 
-      console.log(last_generation);
-      console.log(last_info);
+      // console.log(last_generation);
+      // console.log(last_info);
 
       shift = last_info.shift + 1;
       task = last_info.task;
@@ -173,11 +173,11 @@ $(document).ready(function() {
       }
     }
 
-    console.log(choice);
+    // console.log(choice);
 
     decisions.push([round, choice]);
-    console.log('Decisions')
-    console.log(decisions);
+    // console.log('Decisions')
+    // console.log(decisions);
 
     if(round == 4) {
       $("#submit-response").prop('disabled', true);
@@ -244,7 +244,7 @@ var next = function() {
       $("#previous-text").html('<p><b>Notes from Shift ' + (shift - 1) + ' indicate that another technician, ' + qual_text + 'using their own tests, thought the classifications were:</b></p>' + prev_table);
 
       samples_seen.push([round,prior_sample]);
-      console.log(samples_seen);
+      // console.log(samples_seen);
 
       $("#choice-text").show()
       $("#alt-choice-text").hide();
@@ -332,7 +332,7 @@ var resample = function() {
       $("#nextsample").html(text);
 
       samples_seen.push([round,prior_sample]);
-      console.log(samples_seen);
+      // console.log(samples_seen);
 
       $("#hide-sample").click(function() {
         hideSample();

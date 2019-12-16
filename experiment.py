@@ -26,7 +26,7 @@ def extra_parameters():
     config = get_config()
     config.register("num_participants", int)
 
-DEBUG = True
+DEBUG = False
 
 class Bartlett1932(Experiment):
     """Define the structure of the experiment."""
@@ -44,8 +44,8 @@ class Bartlett1932(Experiment):
         self.models = models
         self.bonus_amount = 0.5
         self.experiment_repeats = 1
-        self.initial_recruitment_size = self.generation_size = 2
-        self.generations = 6
+        self.initial_recruitment_size = self.generation_size = 20
+        self.generations = 10
         self.num_practice_networks_per_experiment = 1 if DEBUG else 2
         self.num_fixed_order_experimental_networks_per_experiment = 0
         self.num_random_order_experimental_networks_per_experiment = 1 if DEBUG else 2
